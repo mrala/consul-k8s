@@ -16,17 +16,14 @@ import (
 	"time"
 
 	"github.com/hashicorp/consul-k8s/control-plane/helper/cert"
-	"github.com/hashicorp/consul-k8s/control-plane/helper/go-discover/mocks"
 	"github.com/hashicorp/consul-k8s/control-plane/helper/test"
 	"github.com/hashicorp/consul-k8s/control-plane/subcommand/common"
 	"github.com/hashicorp/consul/api"
 	"github.com/hashicorp/consul/sdk/freeport"
 	"github.com/hashicorp/consul/sdk/testutil"
 	"github.com/hashicorp/consul/sdk/testutil/retry"
-	"github.com/hashicorp/go-discover"
 	"github.com/hashicorp/go-hclog"
 	"github.com/mitchellh/cli"
-	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	v1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
@@ -50,7 +47,7 @@ func TestRun_FlagValidation(t *testing.T) {
 	}{
 		{
 			Flags:  []string{},
-			ExpErr: "-server-address must be set at least once",
+			ExpErr: "-server-address must be set",
 		},
 		{
 			Flags:  []string{"-server-address=localhost"},
@@ -1984,60 +1981,61 @@ func TestRun_AnonPolicy_IgnoredWithReplication(t *testing.T) {
 
 // Test that when the -server-address contains a cloud-auto join string,
 // we are still able to bootstrap ACLs.
-func TestRun_CloudAutoJoin(t *testing.T) {
-	t.Parallel()
-
-	k8s, testSvr := completeSetup(t)
-	defer testSvr.Stop()
-	setUpK8sServiceAccount(t, k8s, ns)
-
-	// create a mock provider
-	// that always returns the server address
-	// provided through the cloud-auto join string
-	provider := new(mocks.MockProvider)
-	// create stubs for our MockProvider so that it returns
-	// the address of the test agent
-	provider.On("Addrs", mock.Anything, mock.Anything).Return([]string{"127.0.0.1"}, nil)
-
-	// Run the command.
-	ui := cli.NewMockUi()
-	cmd := Command{
-		UI:        ui,
-		clientset: k8s,
-		providers: map[string]discover.Provider{"mock": provider},
-	}
-	args := []string{
-		"-timeout=1m",
-		"-k8s-namespace=" + ns,
-		"-resource-prefix=" + resourcePrefix,
-		"-server-address", "provider=mock",
-		"-server-port", strings.Split(testSvr.HTTPAddr, ":")[1],
-		"-consul-api-timeout", "5s",
-	}
-	responseCode := cmd.Run(args)
-	require.Equal(t, 0, responseCode, ui.ErrorWriter.String())
-
-	// check that the provider has been called
-	provider.AssertNumberOfCalls(t, "Addrs", 1)
-
-	// Test that the bootstrap kube secret is created.
-	bootToken := getBootToken(t, k8s, resourcePrefix, ns)
-
-	// Check that it has the right policies.
-	consul, err := api.NewClient(&api.Config{
-		Address: testSvr.HTTPAddr,
-		Token:   bootToken,
-	})
-	require.NoError(t, err)
-	tokenData, _, err := consul.ACL().TokenReadSelf(nil)
-	require.NoError(t, err)
-	require.Equal(t, "global-management", tokenData.Policies[0].Name)
-
-	// Check that the agent policy was created.
-	agentPolicy := policyExists(t, "agent-token", consul)
-	// Should be a global policy.
-	require.Len(t, agentPolicy.Datacenters, 0)
-}
+// TODO: (ashwin/agentless) Figure out if we still need to test providers.
+//func TestRun_CloudAutoJoin(t *testing.T) {
+//	t.Parallel()
+//
+//	k8s, testSvr := completeSetup(t)
+//	defer testSvr.Stop()
+//	setUpK8sServiceAccount(t, k8s, ns)
+//
+//	// create a mock provider
+//	// that always returns the server address
+//	// provided through the cloud-auto join string
+//	provider := new(mocks.MockProvider)
+//	// create stubs for our MockProvider so that it returns
+//	// the address of the test agent
+//	provider.On("Addrs", mock.Anything, mock.Anything).Return([]string{"127.0.0.1"}, nil)
+//
+//	// Run the command.
+//	ui := cli.NewMockUi()
+//	cmd := Command{
+//		UI:        ui,
+//		clientset: k8s,
+//		providers: map[string]discover.Provider{"mock": provider},
+//	}
+//	args := []string{
+//		"-timeout=1m",
+//		"-k8s-namespace=" + ns,
+//		"-resource-prefix=" + resourcePrefix,
+//		"-server-address", "provider=mock",
+//		"-server-port", strings.Split(testSvr.HTTPAddr, ":")[1],
+//		"-consul-api-timeout", "5s",
+//	}
+//	responseCode := cmd.Run(args)
+//	require.Equal(t, 0, responseCode, ui.ErrorWriter.String())
+//
+//	// check that the provider has been called
+//	provider.AssertNumberOfCalls(t, "Addrs", 1)
+//
+//	// Test that the bootstrap kube secret is created.
+//	bootToken := getBootToken(t, k8s, resourcePrefix, ns)
+//
+//	// Check that it has the right policies.
+//	consul, err := api.NewClient(&api.Config{
+//		Address: testSvr.HTTPAddr,
+//		Token:   bootToken,
+//	})
+//	require.NoError(t, err)
+//	tokenData, _, err := consul.ACL().TokenReadSelf(nil)
+//	require.NoError(t, err)
+//	require.Equal(t, "global-management", tokenData.Policies[0].Name)
+//
+//	// Check that the agent policy was created.
+//	agentPolicy := policyExists(t, "agent-token", consul)
+//	// Should be a global policy.
+//	require.Len(t, agentPolicy.Datacenters, 0)
+//}
 
 func TestRun_GatewayErrors(t *testing.T) {
 	t.Parallel()

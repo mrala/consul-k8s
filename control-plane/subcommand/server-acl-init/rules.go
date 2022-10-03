@@ -422,9 +422,9 @@ partition "{{ .PartitionName }}" {
 
 func (c *Command) rulesData() rulesData {
 	return rulesData{
-		EnablePartitions:        c.flagEnablePartitions,
+		EnablePartitions:        c.consulFlags.Partition != "",
 		EnablePeering:           c.flagEnablePeering,
-		PartitionName:           c.flagPartitionName,
+		PartitionName:           c.consulFlags.Partition,
 		EnableNamespaces:        c.flagEnableNamespaces,
 		SyncConsulDestNS:        c.flagConsulSyncDestinationNamespace,
 		SyncEnableNSMirroring:   c.flagEnableSyncK8SNSMirroring,
