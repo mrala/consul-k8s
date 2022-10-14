@@ -112,7 +112,7 @@ func TestSnapshotAgent_Vault(t *testing.T) {
 	bootstrapTokenSecret.SaveSecretAndAddReadPolicy(t, vaultClient)
 
 	// Snapshot Agent config
-	snapshotAgentConfig := generateSnapshotAgentConfig(t, bootstrapToken)
+	snapshotAgentConfig := generateSnapshotAgentConfig(t)
 	require.NoError(t, err)
 	snapshotAgentConfigSecret := &vault.KV2Secret{
 		Path:       "consul/data/secret/snapshot-agent-config",

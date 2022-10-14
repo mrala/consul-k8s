@@ -1,5 +1,5 @@
 {{- if (and .Values.global.enablePodSecurityPolicies (or (and (ne (.Values.client.enabled | toString) "-") .Values.client.enabled) (and (eq (.Values.client.enabled | toString) "-") .Values.global.enabled))) }}
-{{- if .Values.client.snapshotAgent.enabled }}
+{{- if false }}
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:

@@ -578,7 +578,7 @@ func (c *Command) Run(args []string) int {
 	}
 
 	if c.flagSnapshotAgent {
-		serviceAccountName := c.withPrefix("snapshot-agent")
+		serviceAccountName := c.withPrefix("server")
 		if err := c.createACLPolicyRoleAndBindingRule("snapshot-agent", snapshotAgentRules, consulDC, primaryDC, localPolicy, primary, localComponentAuthMethodName, serviceAccountName, consulClient); err != nil {
 			c.log.Error(err.Error())
 			return 1

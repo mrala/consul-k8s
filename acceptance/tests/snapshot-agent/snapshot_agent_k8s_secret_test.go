@@ -15,7 +15,6 @@ import (
 	"github.com/hashicorp/consul-k8s/acceptance/framework/helpers"
 	"github.com/hashicorp/consul-k8s/acceptance/framework/k8s"
 	"github.com/hashicorp/consul-k8s/acceptance/framework/logger"
-	"github.com/hashicorp/go-uuid"
 	"github.com/stretchr/testify/require"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -36,22 +35,14 @@ func TestSnapshotAgent_K8sSecret(t *testing.T) {
 	ns := kubectlOptions.Namespace
 	releaseName := helpers.RandomName()
 
-	// Generate a bootstrap token
-	bootstrapToken, err := uuid.GenerateUUID()
-	require.NoError(t, err)
-
-	bsSecretName := fmt.Sprintf("%s-acl-bootstrap-token", releaseName)
-	bsSecretKey := "token"
 	saSecretName := fmt.Sprintf("%s-snapshot-agent-config", releaseName)
-	saSecretKey := "token"
+	saSecretKey := "config"
 
 	// Create cluster
 	helmValues := map[string]string{
 		"global.tls.enabled":                           "true",
 		"global.gossipEncryption.autoGenerate":         "true",
 		"global.acls.manageSystemACLs":                 "true",
-		"global.acls.bootstrapToken.secretName":        bsSecretName,
-		"global.acls.bootstrapToken.secretKey":         bsSecretKey,
 		"client.snapshotAgent.enabled":                 "true",
 		"client.snapshotAgent.configSecret.secretName": saSecretName,
 		"client.snapshotAgent.configSecret.secretKey":  saSecretKey,
@@ -61,13 +52,9 @@ func TestSnapshotAgent_K8sSecret(t *testing.T) {
 	consulCluster := consul.NewHelmCluster(t, helmValues, suite.Environment().DefaultContext(t), cfg, releaseName)
 	client := environment.KubernetesClientFromOptions(t, kubectlOptions)
 
-	// Add bootstrap token secret
-	logger.Log(t, "Storing bootstrap token as a k8s secret")
-	consul.CreateK8sSecret(t, client, cfg, ns, bsSecretName, bsSecretKey, bootstrapToken)
-
 	// Add snapshot agent config secret
 	logger.Log(t, "Storing snapshot agent config as a k8s secret")
-	config := generateSnapshotAgentConfig(t, bootstrapToken)
+	config := generateSnapshotAgentConfig(t)
 	logger.Logf(t, "Snapshot agent config: %s", config)
 	consul.CreateK8sSecret(t, client, cfg, ns, saSecretName, saSecretKey, config)
 
@@ -80,17 +67,17 @@ func TestSnapshotAgent_K8sSecret(t *testing.T) {
 	// Create k8s client from kubectl options.
 
 	podList, err := client.CoreV1().Pods(kubectlOptions.Namespace).List(context.Background(),
-		metav1.ListOptions{LabelSelector: fmt.Sprintf("app=consul,component=client-snapshot-agent,release=%s", releaseName)})
+		metav1.ListOptions{LabelSelector: fmt.Sprintf("app=consul,component=server,release=%s", releaseName)})
 	require.NoError(t, err)
 	require.True(t, len(podList.Items) > 0)
 
-	// Wait for 10seconds to allow snapsot to write.
+	// Wait for 10seconds to allow snapshot to write.
 	time.Sleep(10 * time.Second)
 
 	// Loop through snapshot agents.  Only one will be the leader and have the snapshot files.
 	hasSnapshots := false
 	for _, pod := range podList.Items {
-		snapshotFileListOutput, err := k8s.RunKubectlAndGetOutputWithLoggerE(t, kubectlOptions, terratestLogger.Discard, "exec", pod.Name, "-c", "consul-snapshot-agent", "--", "ls", "/")
+		snapshotFileListOutput, err := k8s.RunKubectlAndGetOutputWithLoggerE(t, kubectlOptions, terratestLogger.Discard, "exec", pod.Name, "-c", "consul-snapshot-agent", "--", "ls", "/tmp")
 		logger.Logf(t, "Snapshot: \n%s", snapshotFileListOutput)
 		require.NoError(t, err)
 		if strings.Contains(snapshotFileListOutput, ".snap") {
@@ -104,10 +91,9 @@ func TestSnapshotAgent_K8sSecret(t *testing.T) {
 	require.True(t, hasSnapshots, ".snap")
 }
 
-func generateSnapshotAgentConfig(t *testing.T, token string) string {
+func generateSnapshotAgentConfig(t *testing.T) string {
 	config := map[string]interface{}{
 		"snapshot_agent": map[string]interface{}{
-			"token": token,
 			"log": map[string]interface{}{
 				"level":           "INFO",
 				"enable_syslog":   false,
@@ -124,7 +110,7 @@ func generateSnapshotAgentConfig(t *testing.T, token string) string {
 				"local_scratch_path": "",
 			},
 			"local_storage": map[string]interface{}{
-				"path": ".",
+				"path": "/tmp",
 			},
 		},
 	}

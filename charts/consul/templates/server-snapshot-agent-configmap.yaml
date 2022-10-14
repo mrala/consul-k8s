@@ -1,0 +1,26 @@
+{{- if (or (and (ne (.Values.server.enabled | toString) "-") .Values.server.enabled) (and (eq (.Values.server.enabled | toString) "-") .Values.global.enabled)) }}
+{{- if .Values.client.snapshotAgent.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "consul.fullname" . }}-snapshot-agent-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ template "consul.name" . }}
+    chart: {{ template "consul.chart" . }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+    component: server
+data:
+  snapshot-login.json: |
+    {
+      "snapshot_agent": {
+        "login": {
+          "auth_method": "{{ template "consul.fullname" . }}-k8s-component-auth-method",
+          "bearer_token_file": "/var/run/secrets/kubernetes.io/serviceaccount/token",
+          "meta": {"component": "snapshot-agent"}
+        }
+      }
+    }
+{{- end }}
+{{- end }}
