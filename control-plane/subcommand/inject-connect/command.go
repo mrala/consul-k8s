@@ -529,7 +529,6 @@ func (c *Command) Run(args []string) int {
 			EnableCNI:                     c.flagEnableCNI,
 			TProxyOverwriteProbes:         c.flagTransparentProxyDefaultOverwriteProbes,
 			EnableConsulDNS:               c.flagEnableConsulDNS,
-			ResourcePrefix:                c.flagResourcePrefix,
 			EnableOpenShift:               c.flagEnableOpenShift,
 			Log:                           ctrl.Log.WithName("handler").WithName("connect"),
 			LogLevel:                      c.flagLogLevel,
@@ -537,14 +536,14 @@ func (c *Command) Run(args []string) int {
 		}})
 
 	if c.flagEnableWebhookCAUpdate {
-		err := c.updateWebhookCABundle(ctx)
+		err = c.updateWebhookCABundle(ctx)
 		if err != nil {
 			setupLog.Error(err, "problem getting CA Cert")
 			return 1
 		}
 	}
 
-	if err := mgr.Start(ctx); err != nil {
+	if err = mgr.Start(ctx); err != nil {
 		setupLog.Error(err, "problem running manager")
 		return 1
 	}
