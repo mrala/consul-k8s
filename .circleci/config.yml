@@ -73,6 +73,11 @@ commands:
             make kind-cni-calico
             kind create cluster --config=acceptance/framework/environment/cni-kind/kind.config --name dc2 --image kindest/node:<< parameters.version >>
             make kind-cni-calico
+  build-cli:
+    steps:
+      - run:
+          name: Build consul-k8s CLI
+          command: sudo -E make cli-dev
 
   run-acceptance-tests:
     parameters:
@@ -510,10 +515,6 @@ jobs:
       - install-prereqs
       - create-kind-clusters:
           version: "v1.24.4"
-      - run:
-          name: build consul-k8s cli
-          command: |
-            make cli-dev
       - restore_cache:
           keys:
             - consul-helm-modcache-v2-{{ checksum "acceptance/go.mod" }}
@@ -525,6 +526,7 @@ jobs:
           key: consul-helm-modcache-v2-{{ checksum "acceptance/go.mod" }}
           paths:
             - ~/.go_workspace/pkg/mod
+      - build-cli
       - run: mkdir -p $TEST_RESULTS
       - run-acceptance-tests:
           failfast: true
@@ -546,10 +548,6 @@ jobs:
       - install-prereqs
       - create-kind-clusters:
           version: "v1.24.4"
-      - run:
-          name: build consul-k8s cli
-          command: |
-            make cli-dev
       - restore_cache:
           keys:
             - consul-helm-modcache-v2-{{ checksum "acceptance/go.mod" }}
@@ -561,6 +559,7 @@ jobs:
           key: consul-helm-modcache-v2-{{ checksum "acceptance/go.mod" }}
           paths:
             - ~/.go_workspace/pkg/mod
+      - build-cli
       - run: mkdir -p $TEST_RESULTS
       - run-acceptance-tests:
           failfast: true
@@ -582,10 +581,6 @@ jobs:
       - install-prereqs
       - create-kind-clusters:
           version: "v1.24.4"
-      - run:
-          name: build consul-k8s cli
-          command: |
-            make cli-dev
       - restore_cache:
           keys:
             - consul-helm-modcache-v2-{{ checksum "acceptance/go.mod" }}
@@ -597,6 +592,7 @@ jobs:
           key: consul-helm-modcache-v2-{{ checksum "acceptance/go.mod" }}
           paths:
             - ~/.go_workspace/pkg/mod
+      - build-cli
       - run: mkdir -p $TEST_RESULTS
       - run-acceptance-tests:
           failfast: true
@@ -1129,10 +1125,6 @@ jobs:
       - install-prereqs
       - create-kind-clusters:
           version: "v1.23.0"
-      - run:
-          name: build consul-k8s cli
-          command: |
-            make cli-dev
       - restore_cache:
           keys:
             - consul-helm-modcache-v2-{{ checksum "acceptance/go.mod" }}
@@ -1144,6 +1136,7 @@ jobs:
           key: consul-helm-modcache-v2-{{ checksum "acceptance/go.mod" }}
           paths:
             - ~/.go_workspace/pkg/mod
+      - build-cli
       - run: mkdir -p $TEST_RESULTS
       - run-acceptance-tests:
           consul-k8s-image: $CONSUL_K8S_IMAGE
@@ -1194,10 +1187,6 @@ jobs:
       - install-prereqs
       - create-kind-clusters:
           version: "v1.23.0"
-      - run:
-          name: build consul-k8s cli
-          command: |
-            make cli-dev
       - restore_cache:
           keys:
             - consul-helm-modcache-v2-{{ checksum "acceptance/go.mod" }}
@@ -1209,6 +1198,7 @@ jobs:
           key: consul-helm-modcache-v2-{{ checksum "acceptance/go.mod" }}
           paths:
             - ~/.go_workspace/pkg/mod
+      - build-cli
       - run: mkdir -p $TEST_RESULTS
       - run-acceptance-tests:
           consul-k8s-image: $CONSUL_K8S_IMAGE
