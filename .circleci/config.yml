@@ -1230,6 +1230,11 @@ workflows:
       # The rest of these CircleCI jobs have been migrated to Github Actions. We need to wait until
       # the summer of 2022 for larger puplic Github Action VMs be available before the acceptance tests can
       # be moved
+      # Run acceptance tests using the docker image built for the control plane
+      - acceptance:
+          context: consul-ci
+          requires:
+            - dev-upload-docker
       - build-distro:
           OS: "linux"
           ARCH: "amd64 arm64"
@@ -1238,11 +1243,6 @@ workflows:
           context: consul-ci
           requires:
             - build-distros-linux
-      # Run acceptance tests using the docker image built for the control plane
-      - acceptance:
-          context: consul-ci
-          requires:
-            - dev-upload-docker
 #      - acceptance-tproxy-cni:
 #          context: consul-ci
 #          requires:
