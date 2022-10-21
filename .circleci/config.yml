@@ -29,7 +29,7 @@ commands:
   install-prereqs:
     steps:
       - run:
-          name: Install gotestsum, kind, kubectl, and helm
+          name: Install go, gotestsum, kind, kubectl, and helm
           command: |
             wget https://golang.org/dl/go1.19.2.linux-amd64.tar.gz
             sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf go1.19.2.linux-amd64.tar.gz
@@ -73,6 +73,7 @@ commands:
             make kind-cni-calico
             kind create cluster --config=acceptance/framework/environment/cni-kind/kind.config --name dc2 --image kindest/node:<< parameters.version >>
             make kind-cni-calico
+
   run-acceptance-tests:
     parameters:
       failfast:
@@ -509,6 +510,10 @@ jobs:
       - install-prereqs
       - create-kind-clusters:
           version: "v1.24.4"
+      - run:
+          name: build consul-k8s cli
+          command: |
+            sudo make cli-dev
       - restore_cache:
           keys:
             - consul-helm-modcache-v2-{{ checksum "acceptance/go.mod" }}
@@ -541,6 +546,10 @@ jobs:
       - install-prereqs
       - create-kind-clusters:
           version: "v1.24.4"
+      - run:
+          name: build consul-k8s cli
+          command: |
+            sudo make cli-dev
       - restore_cache:
           keys:
             - consul-helm-modcache-v2-{{ checksum "acceptance/go.mod" }}
@@ -573,6 +582,10 @@ jobs:
       - install-prereqs
       - create-kind-clusters:
           version: "v1.24.4"
+      - run:
+          name: build consul-k8s cli
+          command: |
+            sudo make cli-dev
       - restore_cache:
           keys:
             - consul-helm-modcache-v2-{{ checksum "acceptance/go.mod" }}
@@ -1116,6 +1129,10 @@ jobs:
       - install-prereqs
       - create-kind-clusters:
           version: "v1.23.0"
+      - run:
+          name: build consul-k8s cli
+          command: |
+            sudo make cli-dev
       - restore_cache:
           keys:
             - consul-helm-modcache-v2-{{ checksum "acceptance/go.mod" }}
@@ -1177,6 +1194,10 @@ jobs:
       - install-prereqs
       - create-kind-clusters:
           version: "v1.23.0"
+      - run:
+          name: build consul-k8s cli
+          command: |
+            sudo make cli-dev
       - restore_cache:
           keys:
             - consul-helm-modcache-v2-{{ checksum "acceptance/go.mod" }}
