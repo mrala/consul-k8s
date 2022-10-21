@@ -77,7 +77,9 @@ commands:
     steps:
       - run:
           name: Build consul-k8s CLI
-          command: sudo -E make cli-dev
+          command: |
+          echo $GOPATH
+          sudo -E make cli-dev
 
   run-acceptance-tests:
     parameters:
