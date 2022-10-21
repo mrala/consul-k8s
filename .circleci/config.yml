@@ -513,7 +513,7 @@ jobs:
       - run:
           name: build consul-k8s cli
           command: |
-            sudo make cli-dev
+            make cli-dev
       - restore_cache:
           keys:
             - consul-helm-modcache-v2-{{ checksum "acceptance/go.mod" }}
@@ -549,7 +549,7 @@ jobs:
       - run:
           name: build consul-k8s cli
           command: |
-            sudo make cli-dev
+            make cli-dev
       - restore_cache:
           keys:
             - consul-helm-modcache-v2-{{ checksum "acceptance/go.mod" }}
@@ -585,7 +585,7 @@ jobs:
       - run:
           name: build consul-k8s cli
           command: |
-            sudo make cli-dev
+            make cli-dev
       - restore_cache:
           keys:
             - consul-helm-modcache-v2-{{ checksum "acceptance/go.mod" }}
@@ -1132,7 +1132,7 @@ jobs:
       - run:
           name: build consul-k8s cli
           command: |
-            sudo make cli-dev
+            make cli-dev
       - restore_cache:
           keys:
             - consul-helm-modcache-v2-{{ checksum "acceptance/go.mod" }}
@@ -1197,7 +1197,7 @@ jobs:
       - run:
           name: build consul-k8s cli
           command: |
-            sudo make cli-dev
+            make cli-dev
       - restore_cache:
           keys:
             - consul-helm-modcache-v2-{{ checksum "acceptance/go.mod" }}
