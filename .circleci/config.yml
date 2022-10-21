@@ -1090,7 +1090,7 @@ jobs:
       image: ubuntu-2004:202010-01
     resource_class: xlarge
     steps:
-      - run: 
+      - run:
           name: checkout code
           command: |
             if [ -e '/home/circleci/project/.git' ] ; then
@@ -1151,7 +1151,7 @@ jobs:
       image: ubuntu-2004:202010-01
     resource_class: xlarge
     steps:
-      - run: 
+      - run:
           name: checkout code
           command: |
             if [ -e '/home/circleci/project/.git' ] ; then
@@ -1203,33 +1203,34 @@ jobs:
 
 workflows:
   version: 2
-  test-and-build:
-    jobs:
-      # Build this one control-plane binary so that acceptance and acceptance-tproxy will run
-      # The rest of these CircleCI jobs have been migrated to Github Actions. We need to wait until
-      # the summer of 2022 for larger puplic Github Action VMs be available before the acceptance tests can
-      # be moved
-      - build-distro:
-          OS: "linux"
-          ARCH: "amd64 arm64"
-          name: build-distros-linux
-      - dev-upload-docker:
-          context: consul-ci
-          requires:
-            - build-distros-linux
-      # Run acceptance tests using the docker image built for the control plane
-      - acceptance:
-          context: consul-ci
-          requires:
-            - dev-upload-docker
-#      - acceptance-tproxy-cni:
+# Disable test and build for now as we switch over to github actions
+#  test-and-build:
+#    jobs:
+#      # Build this one control-plane binary so that acceptance and acceptance-tproxy will run
+#      # The rest of these CircleCI jobs have been migrated to Github Actions. We need to wait until
+#      # the summer of 2022 for larger puplic Github Action VMs be available before the acceptance tests can
+#      # be moved
+#      - build-distro:
+#          OS: "linux"
+#          ARCH: "amd64 arm64"
+#          name: build-distros-linux
+#      - dev-upload-docker:
 #          context: consul-ci
 #          requires:
-#            - dev-upload-docker
-#      - acceptance-tproxy:
-#          context: consul-ci
-#          requires:
-#            - dev-upload-docker
+#            - build-distros-linux
+#      # Run acceptance tests using the docker image built for the control plane
+##      - acceptance:
+##          context: consul-ci
+##          requires:
+##            - dev-upload-docker
+##      - acceptance-tproxy-cni:
+##          context: consul-ci
+##          requires:
+##            - dev-upload-docker
+##      - acceptance-tproxy:
+##          context: consul-ci
+##          requires:
+##            - dev-upload-docker
   nightly-acceptance-tests:
     triggers:
       - schedule:

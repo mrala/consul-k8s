@@ -75,8 +75,8 @@ func TestConnectInject(t *testing.T) {
 
 			// Run proxy list and get the two results.
 			listOut, err := cli.Run(t, ctx.KubectlOptions(t), "proxy", "list")
-			require.NoError(t, err)
 			logger.Log(t, string(listOut))
+			require.NoError(t, err)
 			list := translateListOutput(listOut)
 			require.Equal(t, 2, len(list))
 			for _, proxyType := range list {
