@@ -67,7 +67,7 @@ func TestConsulSyncer_reapServiceInstance(t *testing.T) {
 	t.Parallel()
 
 	for _, node := range []string{ConsulSyncNodeName, "test-node"} {
-		name := fmt.Sprintf("consul node name: %s", node)
+		name := fmt.Sprintf("consul node name %s", node)
 		t.Run(name, func(t *testing.T) {
 			require := require.New(t)
 

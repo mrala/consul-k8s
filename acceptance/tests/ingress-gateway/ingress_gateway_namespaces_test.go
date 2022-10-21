@@ -38,7 +38,7 @@ func TestIngressGatewaySingleNamespace(t *testing.T) {
 		},
 	}
 	for _, c := range cases {
-		name := fmt.Sprintf("secure: %t", c.secure)
+		name := fmt.Sprintf("secure %t", c.secure)
 		t.Run(name, func(t *testing.T) {
 			ctx := suite.Environment().DefaultContext(t)
 
@@ -160,7 +160,7 @@ func TestIngressGatewayNamespaceMirroring(t *testing.T) {
 		},
 	}
 	for _, c := range cases {
-		name := fmt.Sprintf("secure: %t", c.secure)
+		name := fmt.Sprintf("secure %t", c.secure)
 		t.Run(name, func(t *testing.T) {
 			ctx := suite.Environment().DefaultContext(t)
 

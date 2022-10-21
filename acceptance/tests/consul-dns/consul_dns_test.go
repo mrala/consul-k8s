@@ -27,7 +27,7 @@ func TestConsulDNS(t *testing.T) {
 	}
 
 	for _, secure := range []bool{false, true} {
-		name := fmt.Sprintf("secure: %t", secure)
+		name := fmt.Sprintf("secure %t", secure)
 		t.Run(name, func(t *testing.T) {
 			env := suite.Environment()
 			ctx := env.DefaultContext(t)

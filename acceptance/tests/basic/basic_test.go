@@ -42,7 +42,7 @@ func TestBasicInstallation(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		name := fmt.Sprintf("secure: %t, auto-encrypt: %t", c.secure, c.autoEncrypt)
+		name := fmt.Sprintf("secure %t, auto-encrypt: %t", c.secure, c.autoEncrypt)
 		t.Run(name, func(t *testing.T) {
 			releaseName := helpers.RandomName()
 			helmValues := map[string]string{

@@ -273,7 +273,7 @@ func TestHandlerConsulDataplaneSidecar_Concurrency(t *testing.T) {
 
 func TestHandlerConsulDataplaneSidecar_Multiport(t *testing.T) {
 	for _, aclsEnabled := range []bool{false, true} {
-		name := fmt.Sprintf("acls enabled: %t", aclsEnabled)
+		name := fmt.Sprintf("acls enabled %t", aclsEnabled)
 		t.Run(name, func(t *testing.T) {
 			w := MeshWebhook{
 				ConsulAddress: "1.1.1.1",

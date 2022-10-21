@@ -1106,7 +1106,7 @@ func TestHandlerContainerInit_Multiport(t *testing.T) {
 // when http or gRPC ports are different from defaults.
 func TestHandlerContainerInit_WithTLSAndCustomPorts(t *testing.T) {
 	for _, caProvided := range []bool{true, false} {
-		name := fmt.Sprintf("ca provided: %t", caProvided)
+		name := fmt.Sprintf("ca provided %t", caProvided)
 		t.Run(name, func(t *testing.T) {
 			w := MeshWebhook{
 				ConsulAddress: "10.0.0.0",

@@ -175,7 +175,7 @@ func TestConnectInjectOnUpgrade(t *testing.T) {
 // Test the endpoints controller cleans up force-killed pods.
 func TestConnectInject_CleanupKilledPods(t *testing.T) {
 	for _, secure := range []bool{false, true} {
-		name := fmt.Sprintf("secure: %t", secure)
+		name := fmt.Sprintf("secure %t", secure)
 		t.Run(name, func(t *testing.T) {
 			cfg := suite.Config()
 			ctx := suite.Environment().DefaultContext(t)
@@ -243,7 +243,7 @@ const multiportAdmin = "multiport-admin"
 // multiport app to static-server.
 func TestConnectInject_MultiportServices(t *testing.T) {
 	for _, secure := range []bool{false, true} {
-		name := fmt.Sprintf("secure: %t", secure)
+		name := fmt.Sprintf("secure %t", secure)
 		t.Run(name, func(t *testing.T) {
 			cfg := suite.Config()
 			ctx := suite.Environment().DefaultContext(t)

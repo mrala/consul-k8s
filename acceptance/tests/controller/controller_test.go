@@ -47,7 +47,7 @@ func TestController(t *testing.T) {
 	const IntentionName = "svc1"
 
 	for _, c := range cases {
-		name := fmt.Sprintf("secure: %t, vault: %t", c.secure, c.useVault)
+		name := fmt.Sprintf("secure %t, vault: %t", c.secure, c.useVault)
 		t.Run(name, func(t *testing.T) {
 			ctx := suite.Environment().DefaultContext(t)
 
